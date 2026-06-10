@@ -1,0 +1,83 @@
+[workspace]
+resolver = "2"
+members = [
+    "vramhub-core",
+    "vramhub-chain",
+    "vramhub-adapter",
+    "vramhub-cli",
+]
+
+[workspace.package]
+version     = "0.7.0"
+edition     = "2021"
+authors     = ["VRAM Network Contributors"]
+license     = "Apache-2.0"
+repository  = "https://github.com/VRAM-AI/vram-network"
+description = "VRAM Network — open-source SDK for the decentralized AI training protocol"
+
+[workspace.dependencies]
+# Async
+tokio        = { version = "1.40", features = ["full"] }
+tokio-stream = "0.1"
+futures      = "0.3"
+
+# Sui SDK
+sui-sdk      = { git = "https://github.com/MystenLabs/sui", package = "sui-sdk",    branch = "main" }
+sui-types    = { git = "https://github.com/MystenLabs/sui", package = "sui-types",  branch = "main" }
+sui-keys     = { git = "https://github.com/MystenLabs/sui", package = "sui-keys",   branch = "main" }
+shared-crypto = { git = "https://github.com/MystenLabs/sui", package = "shared-crypto", branch = "main" }
+
+# Serialization
+serde       = { version = "1.0", features = ["derive"] }
+serde_json  = "1.0"
+bcs         = "0.1"
+base64      = "0.22"
+hex         = "0.4"
+
+# Error handling
+anyhow      = "1.0"
+thiserror   = "1.0"
+
+# Logging
+tracing            = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# CLI
+clap = { version = "4.5", features = ["derive", "env"] }
+
+# Config / env
+dotenv = { package = "dotenvy", version = "0.15" }
+
+# HTTP
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Crypto
+sha2    = "0.10"
+rand    = "0.8"
+ed25519-dalek = "2"
+k256    = "0.13"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# BIP-39 for keypair derivation
+bip39 = "2"
+bip32 = "0.4"
+
+# CBOR (attestation document parsing)
+ciborium = "0.2"
+
+# Adapter trait
+async-trait = "0.1"
+
+# Python bindings (optional, vramhub-chain only)
+pyo3 = { version = "0.22", features = ["extension-module"] }
+
+[profile.release]
+opt-level      = 3
+lto            = "fat"
+codegen-units  = 1
+
+[profile.dev]
+opt-level = 0
+debug     = true

@@ -1,0 +1,29 @@
+[package]
+name = "vramhub-chain"
+version.workspace = true
+edition.workspace = true
+
+[features]
+python = ["pyo3"]
+
+[dependencies]
+vramhub-core = { path = "../vramhub-core" }
+sui-sdk = { workspace = true }
+sui-types = { workspace = true }
+sui-keys = { workspace = true }
+shared-crypto = { workspace = true }
+bcs = { workspace = true }
+base64 = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+hex = { workspace = true }
+futures = { workspace = true }
+bip39 = { workspace = true }
+bip32 = { workspace = true }
+
+# Python bindings (optional, enabled via 'python' feature)
+pyo3 = { workspace = true, optional = true }

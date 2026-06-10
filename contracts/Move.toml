@@ -1,0 +1,17 @@
+[package]
+name = "slcl"
+version = "0.5.0"
+edition = "2024"
+
+[addresses]
+slcl = "0x0"
+sui = "0x2"
+std = "0x1"
+
+[environments]
+testnet = "4c78adac"
+devnet = "e9eed8f1"
+mainnet = "35834a8a"
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }

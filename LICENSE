@@ -1,0 +1,92 @@
+Business Source License 1.1
+
+Parameters
+
+Licensor:             VRAM AI Limited
+Licensed Work:        VRAM HUB - Decentralized LLM Training Coordination Network
+                      The Licensed Work is (c) 2024-2025 VRAM AI Limited.
+
+Additional Use Grant: You may use the Software for any purpose except:
+                      1. Operating a Decentralized LLM Training Coordination
+                         Network as a commercial service
+                      2. Selling validator-as-a-service using this Software
+                      3. Building a competing coordination layer for
+                         distributed AI model training
+                      4. Any commercial product whose primary value comes from
+                         this Software's coordination capabilities
+
+                      Personal use, research, non-commercial projects, and
+                      running your own miner/validator node are explicitly
+                      permitted without restriction.
+
+Change Date:          2029-01-01
+
+Change License:       Apache License, Version 2.0
+
+For information about alternative licensing arrangements for the Software,
+please contact: licensing@vram.ai
+
+Notice
+
+The Business Source License (this document, or the "License") is not an Open
+Source license. However, the Licensed Work will eventually be made available
+under an Open Source License, as stated in this License.
+
+License text copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+"Business Source License" is a trademark of MariaDB Corporation Ab.
+
+---------------------------------------------------------------------
+
+Business Source License 1.1 Terms
+
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and make non-production use of the Licensed Work. The
+Licensor may make an Additional Use Grant, above, permitting limited
+production use.
+
+Effective on the Change Date, or the fourth anniversary of the first publicly
+available distribution of a specific version of the Licensed Work under this
+License, whichever comes first, the Licensor hereby grants you rights under
+the terms of the Change License, and the rights granted in the paragraph
+above terminate.
+
+If your use of the Licensed Work does not comply with the requirements
+currently in effect as described in this License, you must purchase a
+commercial license from the Licensor, its affiliated entities, or authorized
+resellers, or you must refrain from using the Licensed Work.
+
+All copies of the original and modified Licensed Work, and derivative works
+of the Licensed Work, are subject to this License. This License applies
+separately for each version of the Licensed Work. This License does not
+grant any rights in the trademarks, service marks, or logos of any Contributor
+(except as may be necessary to comply with the notice requirements in Section 4).
+
+THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
+IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND
+PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU
+ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY
+COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM AS
+PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL,
+INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
+INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE
+PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY
+HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+---------------------------------------------------------------------
+
+Component Licensing
+
+slcl-miner, slcl-validator, slcl-aggregator,
+slcl-cli:                                        BSL 1.1 → Apache 2.0 (2029)
+slcl-core, slcl-chain, slcl-seal, slcl-comms,
+slcl-adapter, slcl-local-demo:                   MIT (commodity, builds ecosystem)
+Move contracts (contracts/):                     MIT (transparency builds trust)
+slcl-nautilus (enclave):                         Proprietary binary only
+
+For component-specific licenses, see the LICENSE file in each crate directory.
