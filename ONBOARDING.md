@@ -24,10 +24,10 @@ The key insight: we don't trust miners to self-report results. A Nitro enclave m
 
 | Goal | How |
 |---|---|
-| **Run a miner** | `curl -sSL https://install.vram.ai/miner \| sh` (closed-source signed binary; freely installable) |
+| **Run a miner** | `curl -sSL https://www.vram.network/install.sh \| sh` (closed-source signed binary; freely installable) |
 | **Run a validator** | Requires AWS Nitro Enclave host; see `scripts/install-validator.sh` and `docs/validators/setup.md` |
-| **Post a training job** | https://vramscan.io/training or `vramhub-cli job post` |
-| **Try the demo** | https://vramscan.io/demotrain — upload a dataset, see Walrus integration + cost simulator + animated training |
+| **Post a training job** | https://www.vram.network/training or `vramhub-cli job post` |
+| **Try the demo** | https://www.vram.network/demotrain — upload a dataset, see Walrus integration + cost simulator + animated training |
 | **Plug a new model architecture** | Implement `TrainingFrameworkAdapter` (see `crates/vramhub-adapter/src/lib.rs`); reference impls: ToyAdapter, CandleAdapter, SidecarAdapter |
 | **Build on top via SDK** | Public SDK `vram-sdk` launches Q3 2026; until then email `builders@vram.ai` for early access |
 | **Audit the contracts** | `contracts/sources/*.move` (MIT); v0.7 deployed at package [`0xaff18bf6…`](https://suiscan.xyz/testnet/object/0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5) |
@@ -62,7 +62,7 @@ The key insight: we don't trust miners to self-report results. A Nitro enclave m
 | `vramhub-validator` | Decrypts miner R2 credentials via Seal IBE, downloads gradients, runs Nitro enclave scoring |
 | Nautilus enclave | AWS Nitro TEE — scores gradient quality (loss delta), signs with hardware Ed25519 key |
 | Sui contracts | PeerRegistry, ScoreLedger, RewardPool — coordination and token distribution |
-| VRAMScan | Block explorer at `http://localhost:4322` — shows live windows, miner scores, run history, training guide |
+| VRAMScan | Block explorer at `https://www.vram.network` — shows live windows, miner scores, run history, training guide |
 | Python sidecar | `scripts/vram_trainer.py` — any HuggingFace causal LM trains via HTTP; Rust handles chain/R2/compression |
 
 ---
@@ -80,127 +80,84 @@ Everything is deployed and funded. No setup required on the contract side.
 | RoundState | `0xc1f18dc92629907641bc3176449af39738d2d8a93b4ad6b22548f4aed91d2611` |
 | RewardPool | `0x576ebeb78449ad46ef70dc3c5ca4e38d178846610bd7cf9f0764ae2f1dc0fe93` |
 
-**Token:** VRAM · 9 decimals · 500M hard cap · 1,200 VRAM/window emission  
+**Token:** VRAM · 9 decimals · 21M hard cap · 70 VRAM/window emission (Phase 1)  
 **Explorer:** https://suiscan.xyz/testnet/object/0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5
 
 ---
 
-## Option A — Test Locally (no wallet, no AWS, 5 minutes)
+## Option A — Explore the Live Network (no setup)
 
-This runs a full simulation: 6 miners + 3 validators, a toy bigram LLM, and live scoring — all in-process. No wallet, no GPU, no cloud accounts needed.
+The easiest starting point is the live block explorer:
+
+- **https://www.vram.network** — live training windows, miner leaderboard, scores
+- **https://www.vram.network/demotrain** — simulate posting a training job (Walrus upload + cost estimator)
+- **https://www.vram.network/training** — earnings calculator and GPU pricing guide
+- **https://suiscan.xyz/testnet/object/0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5** — raw on-chain state
+
+To audit the contracts locally (no wallet needed):
 
 ```bash
-git clone https://github.com/VRAM-AI/VRAM-HUB.git
-cd VRAM-HUB
+git clone https://github.com/VRAM-AI/vram-network.git
+cd vram-network/contracts
 
-# Terminal 1 — run the demo
-cargo run -p vramhub-local-demo
-
-# Terminal 2 — run the block explorer
-cd vramscan
-npm install
-npm run dev
+# Run all 101 Move unit tests
+sui move test
 ```
-
-Open **http://localhost:4322** — you will see:
-- Live training windows ticking up
-- Miner weight bars updating every 10 windows
-- `/runs` page showing run history with score progression charts
-
-The demo writes a persistent run log to `.vramhub-runs/run_history.jsonl`. It survives restarts so you can compare runs over time.
-
-**What to look for:**
-- Miners start with equal weights, then diverge as OpenSkill ratings converge
-- Top miners get exponentially more weight (squared ordinal weighting)
-- Window clock advances every few seconds (sped up for demo)
 
 ---
 
-## Option B — Connect a Real Miner to Testnet (30 minutes)
+## Option B — Connect a Real Miner to Testnet (~10 minutes)
 
 ### Prerequisites
 
-- Linux machine with any NVIDIA GPU (or Apple Silicon for Metal)
-- Rust 1.80+ (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
-- A free [Cloudflare](https://dash.cloudflare.com) account for R2 storage
+- Linux x86_64 or aarch64 machine with any NVIDIA GPU (CPU fallback works, earnings are lower)
+- Python 3.8+ and pip
+- A Sui wallet with testnet SUI (free from faucet)
 
-### Step 1 — Get testnet SUI
-
-```bash
-# Install Sui CLI — pick the right binary for your OS at:
-# https://github.com/MystenLabs/sui/releases
-
-# Create a wallet and connect to testnet
-sui client new-env --alias testnet --rpc https://fullnode.testnet.sui.io:443
-sui client switch --env testnet
-sui client new-address ed25519   # note the address printed
-
-# Fund it (paste your address at):
-# https://faucet.sui.io
-```
-
-### Step 2 — Set up Cloudflare R2
-
-1. https://dash.cloudflare.com → **R2** → **Create bucket** (e.g. `vram-miner-yourname`)
-2. R2 → **Manage API tokens** → Create token with **Object Read & Write** on your bucket
-3. Note: Account ID, Bucket name, Access Key ID, Secret Access Key
-
-### Step 3 — Configure and run
+### Step 1 — Run the installer
 
 ```bash
-git clone https://github.com/VRAM-AI/VRAM-HUB.git
-cd VRAM-HUB
-cargo build --workspace --release
-
-cp .env.example .env
+curl -sSL https://www.vram.network/install.sh | sh
 ```
 
-Edit `.env` — the only fields you need to change:
+The script downloads the `vramhub-miner` binary, installs the Python sidecar, creates `~/.vramhub/.env` with all testnet contract IDs pre-filled, and creates a `vram-miner` launcher in `~/.local/bin`.
+
+### Step 2 — Set your wallet mnemonic
 
 ```bash
-VRAMHUB_WALLET_MNEMONIC="your twelve word mnemonic phrase here"
-VRAMHUB_R2_ACCOUNT_ID=your-cloudflare-account-id
-VRAMHUB_R2_BUCKET_NAME=vram-miner-yourname
-VRAMHUB_R2_ACCESS_KEY_ID=your-r2-key-id
-VRAMHUB_R2_SECRET_ACCESS_KEY=your-r2-secret
+nano ~/.vramhub/.env
+# Set: VRAMHUB_WALLET_MNEMONIC="your twelve word mnemonic phrase here"
 ```
 
-> **Security:** Never commit `.env` to git. The `.gitignore` already excludes it.  
-> Keep your mnemonic private — it controls your wallet and signs all on-chain operations.
+Get a free Sui wallet if you don't have one:
+```bash
+sui keytool generate ed25519
+# Then fund at: https://faucet.sui.io
+```
 
-Everything else (package ID, object IDs, Seal key servers) is pre-filled.
+> **Security:** Keep your mnemonic private — it controls your wallet and signs all on-chain operations.
+
+### Step 3 — Start mining
 
 ```bash
-# Python sidecar — recommended for testnet (any HuggingFace model)
-# Terminal 1:
-pip install -r scripts/requirements.txt
-python scripts/vram_trainer.py --model gpt2 --device cuda   # or --device cpu
-
-# Terminal 2:
-RUST_LOG=info VRAMHUB_SIDECAR_URL=http://127.0.0.1:7070 \
-  cargo run --release --bin vramhub-miner --features sidecar
+vram-miner                        # default model (gpt2, any GPU/CPU)
+vram-miner --model gpt2-xl        # larger model, more rewards
+vram-miner --device cuda:0        # explicit GPU selection
 ```
 
-> **Note:** The `candle`, `cuda`, and `metal` feature flags exist but the Candle adapter is a stub pending [bounty #15](https://github.com/VRAM-AI/VRAM-HUB/issues/15). Use the Python sidecar for real training today.
+The miner auto-registers on first startup (saves UID to `~/.vramhub/.vramhub-uid`). You'll see your UID printed — use it to track your score on [VRAMScan](https://www.vram.network).
 
-The miner auto-registers on first startup (saves UID to `.vramhub-uid`) and starts training. You'll see your UID printed on startup — use it to track your scores on VRAMScan.
-
-### Option B2 — Use your own PyTorch model (Python sidecar)
-
-The sidecar lets any HuggingFace causal LM participate as a miner. Rust handles chain, R2, and compression; Python handles the forward/backward pass.
+**To use a custom HuggingFace model** (bring your own PyTorch model):
 
 ```bash
-# Terminal 1 — start the Python sidecar
-pip install -r scripts/requirements.txt
-python scripts/vram_trainer.py --model gpt2 --device cuda
+# Terminal 1 — start the Python sidecar with your model
+python3 ~/.vramhub/vram_trainer.py --model mistralai/Mistral-7B-v0.1 --device cuda --port 17070
 
-# Terminal 2 — start the miner pointing at the sidecar
-VRAMHUB_SIDECAR_URL=http://127.0.0.1:7070 \
-  cargo run --release --bin vramhub-miner --features sidecar
+# Terminal 2 — miner picks it up automatically (VRAMHUB_SIDECAR_URL is pre-set)
+vram-miner
 ```
 
-Supported models: any `AutoModelForCausalLM`-compatible HuggingFace model.  
-The sidecar defaults to `gpt2` (124M). Pass `--model mistralai/Mistral-7B-v0.1` etc. for larger models.
+Supported: any `AutoModelForCausalLM`-compatible HuggingFace model.
 
 ---
 
@@ -250,20 +207,22 @@ cargo run --release --bin vramhub-validator
 
 | Parameter | Value |
 |-----------|-------|
-| Hard cap | 500,000,000 VRAM |
+| Hard cap | 21,000,000 VRAM |
 | Decimals | 9 |
+| Mining pool (50%) | 10,500,000 VRAM |
+| TGE pre-mint (50%) | 10,500,000 VRAM |
 | Window duration | 10 minutes |
-| Genesis emission | 1,200 VRAM/window |
-| Halving | Every 4 years (governance) |
-| Year 1 total emission | ~63M VRAM (~12.6% of supply) |
+| Phase 1 emission | 70 VRAM/window (0 → 7M mining tokens) |
+| Phase 2 emission | 35 VRAM/window (7M → 10.5M) |
 
-**Distribution per window:**
+**TGE pre-mint breakdown:**
 
-| Recipient | v0.4 (current) | v0.5+ |
-|-----------|---------------|-------|
-| Miners | 100% | 72% |
-| Validators | — | 18% |
-| Treasury | — | 10% |
+| Allocation | % | VRAM | Vesting |
+|------------|---|------|---------|
+| Treasury | 30% | 6,300,000 | 6m cliff, 48m linear |
+| Team | 8% | 1,680,000 | 12m cliff, 36m linear |
+| Liquidity | 7% | 1,470,000 | 100% unlocked at TGE |
+| Airdrop | 5% | 1,050,000 | Instant at TGE (converts from testnet contribution points) |
 
 Miner rewards are proportional to each miner's OpenSkill normalized weight (see [docs/incentives.md](docs/incentives.md)).
 
@@ -309,22 +268,14 @@ scripts/
   requirements.txt  Python dependencies (torch, transformers, flask)
   build-enclave.sh  Nitro EIF build script (prints PCR0/PCR1/PCR2)
 
-vramscan/           Next.js block explorer (http://localhost:4322)
-  app/
-    page.tsx              network overview (live window, peer counts, emission)
-    /miners               miner leaderboard with OpenSkill weights
-    /validators           validator list and stake
-    /windows              historical window data
-    /window/[id]          single window detail
-    /wallet/[address]     user quest tracking and earnings
-    /runs                 local demo run history
-    /training             earnings calculator, GPU pricing comparison, quick-start
-    /join                 step-by-step onboarding for new miners and validators
-    /docs/[[...slug]]     protocol docs rendered from /docs directory
-  lib/
-    api-real.ts           live Sui RPC client (all blockchain reads)
-    tokenomics.ts         VRAM emission schedule math
-    types.ts              TypeScript interfaces
+VRAMScan          Next.js block explorer — https://www.vram.network
+  /miners               miner leaderboard with OpenSkill weights
+  /validators           validator list and stake
+  /windows              historical window data
+  /wallet/[address]     user quest tracking and earnings
+  /training             earnings calculator, GPU pricing comparison, quick-start
+  /join                 step-by-step onboarding for new miners and validators
+  /demotrain            training job demo (Walrus upload + cost simulator)
 
 docs/
   getting-started.md    non-technical introduction (start here)
@@ -355,7 +306,7 @@ paper/
 | Miners — CUDA / Metal training | ✅ Ready |
 | Miners — Python sidecar | ✅ Ready |
 | Top-K f16 gradient compression | ✅ Ready |
-| VRAMScan explorer + /training page | ✅ Running locally |
+| VRAMScan explorer + /training page | ✅ Live at www.vram.network |
 | Seal IBE credential privacy | ✅ Configured (testnet key servers) |
 | Validator scoring | ⏳ Needs Nitro enclave (~$36/mo spot) |
 | VRAM token payouts | ⏳ Unblocked once first validator is up |

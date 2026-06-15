@@ -13,7 +13,7 @@
 
 **Trustless decentralised machine learning on Sui.** GPU miners train models; AWS Nitro Enclave validators score every gradient and sign the proof on-chain; rewards settle in **VRAM** every 10 minutes — no trusted coordinator, no whitelist.
 
-[**Try the live demo →**](https://vramscan.io/demotrain) (drag-drop a zip, upload to Walrus, run a simulated training) · [**Block explorer**](https://vramscan.io) · [**Whitepaper (NDA)**](mailto:team@vram.ai) · [**Sui Explorer**](https://suiscan.xyz/testnet/object/0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5)
+[**Try the live demo →**](https://www.vram.network/demotrain) (drag-drop a zip, upload to Walrus, run a simulated training) · [**Block explorer**](https://www.vram.network) · [**Whitepaper (NDA)**](mailto:team@vram.ai) · [**Sui Explorer**](https://suiscan.xyz/testnet/object/0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5)
 
 ---
 
@@ -21,7 +21,7 @@
 
 > **What this repo contains:** the working monorepo for Vram Network. Closed-source miner, validator, aggregator, and Nautilus enclave binaries are distributed from this repo via signed install scripts. The protocol itself — smart contracts, adapter framework, storage layer, SDK — is mirrored to the public repo [`VRAM-AI/vram-sdk`](https://github.com/VRAM-AI/vram-sdk) for builders.
 >
-> **This is the public front door for miners.** Run `curl -sSL https://install.vram.ai/miner | sh`, set your wallet mnemonic in `~/.vramhub/.env`, and start earning VRAM. No GPU, no cloud account, no whitelist. The miner binary is closed-source; the network protocol it speaks is fully open and verifiable on chain.
+> **This is the public front door for miners.** Run `curl -sSL https://www.vram.network/install.sh | sh`, set your wallet mnemonic in `~/.vramhub/.env`, and start earning VRAM. No GPU, no cloud account, no whitelist. The miner binary is closed-source; the network protocol it speaks is fully open and verifiable on chain.
 >
 > **For builders who want to compose on top of Vram Network** — post training jobs, plug a new model architecture into the SidecarAdapter, run inference against trained models — use [`VRAM-AI/vram-sdk`](https://github.com/VRAM-AI/vram-sdk) (open SDK + contracts + docs).
 
@@ -34,7 +34,7 @@ This split mirrors the Claude Code pattern: the wrapper, the protocol, and the S
 One line on Linux / macOS:
 
 ```bash
-curl -sSL https://install.vram.ai/miner | sh
+curl -sSL https://www.vram.network/install.sh | sh
 ```
 
 The script:
@@ -74,7 +74,7 @@ In the meantime:
 | You want to | Use |
 |---|---|
 | Run the protocol locally (smoke test) | `cargo run --bin vramhub-local-demo` (closed source until vram-sdk launches) |
-| Try the customer flow (post a training job) | https://vramscan.io/demotrain |
+| Try the customer flow (post a training job) | https://www.vram.network/demotrain |
 | Verify the contracts | https://suiscan.xyz/testnet/object/0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5 |
 | Snapshot the airdrop counter | `python scripts/snapshot_airdrop.py` |
 

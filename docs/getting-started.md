@@ -45,29 +45,24 @@ Any HuggingFace causal LM works. The sidecar handles training; VRAM handles rewa
 
 ### I want to explore the network
 
-→ **[VRAMScan](vramscan/overview.md)** at `http://localhost:4322` (after `cd vramscan && npm run dev`)
+→ **[VRAMScan](https://www.vram.network)** — live block explorer, miner leaderboard, scores
 
 ---
 
-## Quick Test (No GPU, No Wallet — 5 Minutes)
+## Quick Start (No GPU, No Wallet — 2 Minutes)
 
-Run a full local simulation to see how the protocol works before committing any hardware:
+Browse the live network at **[www.vram.network](https://www.vram.network)**:
+- Watch live training windows and miner scores
+- Try the [training demo](https://www.vram.network/demotrain) — simulate a job, see Walrus integration
+- Check the [earnings calculator](https://www.vram.network/training) — GPU pricing, projected rewards
+
+To audit the contracts locally:
 
 ```bash
-git clone https://github.com/VRAM-AI/VRAM-HUB.git
-cd VRAM-HUB
-
-# Terminal 1: full simulation (6 miners, 3 validators, toy LLM)
-cargo run -p vramhub-local-demo
-
-# Terminal 2: block explorer
-cd vramscan && npm install && npm run dev
+git clone https://github.com/VRAM-AI/vram-network.git
+cd vram-network/contracts
+sui move test   # runs all 101 unit tests
 ```
-
-Open **http://localhost:4322** and watch:
-- Miners competing over training windows
-- OpenSkill ratings diverging as better miners pull ahead
-- VRAM token emission per window
 
 ---
 
@@ -91,12 +86,12 @@ Everything below is live on Sui testnet. No setup required on the contract side.
 
 | Parameter | Value |
 |-----------|-------|
-| Hard cap | 500,000,000 VRAM |
+| Hard cap | 21,000,000 VRAM |
+| Mining pool | 10,500,000 VRAM (50%) |
+| TGE pre-mint | 10,500,000 VRAM (50%) |
 | Window duration | 10 minutes |
-| Emission per window | 1,200 VRAM |
-| Miner share (v0.4) | 100% |
-| Miner share (v0.5+) | 72% miners · 18% validators · 10% treasury |
-| Halving | Every 4 years (governance vote) |
+| Phase 1 emission | 70 VRAM/window (0 → 7M mining tokens) |
+| Phase 2 emission | 35 VRAM/window (7M → 10.5M) |
 
 Miner rewards are proportional to each miner's **OpenSkill normalized weight**. The weight is derived from your gradient quality score across multiple windows — not just the most recent one.
 
