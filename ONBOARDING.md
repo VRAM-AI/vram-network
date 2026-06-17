@@ -25,7 +25,7 @@ The key insight: we don't trust miners to self-report results. A Nitro enclave m
 | Goal | How |
 |---|---|
 | **Run a miner** | `curl -sSL https://www.vram.network/install.sh \| sh` (closed-source signed binary; freely installable) |
-| **Run a validator** | Requires AWS Nitro Enclave host; see `scripts/install-validator.sh` and `docs/validators/setup.md` |
+| **Run a validator** | `curl -sSf https://raw.githubusercontent.com/VRAM-AI/vram-validator/main/install.sh \| bash` — test mode works on any Linux VPS; Nitro enclave requires AWS `c5.xlarge` |
 | **Post a training job** | https://www.vram.network/training or `vramhub-cli job post` |
 | **Try the demo** | https://www.vram.network/demotrain — upload a dataset, see Walrus integration + cost simulator + animated training |
 | **Plug a new model architecture** | Implement `TrainingFrameworkAdapter` (see `crates/vramhub-adapter/src/lib.rs`); reference impls: ToyAdapter, CandleAdapter, SidecarAdapter |
@@ -37,7 +37,7 @@ The key insight: we don't trust miners to self-report results. A Nitro enclave m
 ## Architecture in 60 Seconds
 
 ```
-┌──────────────┐     gradient (R2)      ┌──────────────────────┐
+┌──────────────┐   gradient (Walrus)    ┌──────────────────────┐
 │    Miner     │ ───────────────────▶  │  Nitro Enclave (TEE) │
 │  (any GPU)   │                        │  - downloads gradient │
 └──────────────┘                        │  - scores loss delta  │
@@ -58,12 +58,12 @@ The key insight: we don't trust miners to self-report results. A Nitro enclave m
 
 | Component | What it does |
 |-----------|-------------|
-| `vramhub-miner` | Trains on assigned data batch, compresses gradient (top-K f16), uploads to R2, anchors checkpoint hash on-chain |
-| `vramhub-validator` | Decrypts miner R2 credentials via Seal IBE, downloads gradients, runs Nitro enclave scoring |
+| `vramhub-miner` | Trains on assigned data batch, compresses gradient (top-K f16), uploads to Walrus (free on testnet), anchors blob ID on-chain |
+| `vramhub-validator` | Downloads gradients from Walrus public aggregator, runs Nitro enclave scoring |
 | Nautilus enclave | AWS Nitro TEE — scores gradient quality (loss delta), signs with hardware Ed25519 key |
 | Sui contracts | PeerRegistry, ScoreLedger, RewardPool — coordination and token distribution |
 | VRAMScan | Block explorer at `https://www.vram.network` — shows live windows, miner scores, run history, training guide |
-| Python sidecar | `scripts/vram_trainer.py` — any HuggingFace causal LM trains via HTTP; Rust handles chain/R2/compression |
+| Python sidecar | `scripts/vram_trainer.py` — any HuggingFace causal LM trains via HTTP; Rust handles chain/Walrus/compression |
 
 ---
 
@@ -165,16 +165,70 @@ Supported: any `AutoModelForCausalLM`-compatible HuggingFace model.
 
 Test mode lets any Linux VPS participate as a validator on testnet. Scoring is simulated (no Nitro enclave), but the full chain flow works — scores are submitted on-chain and miners get rated. VRAMScan labels these validators as **Simulated**.
 
-```bash
-# Copy and fill in your .env (wallet mnemonic + R2 credentials)
-cp .env.example .env
+### Step 1 — Install the validator binary
 
-# Run validator — simulated scoring, no AWS hardware required
-RUST_LOG=info VRAMHUB_TEST_MODE=true \
-  cargo run --release --bin vramhub-validator
+```bash
+curl -sSf https://raw.githubusercontent.com/VRAM-AI/vram-validator/main/install.sh | bash
 ```
 
-> Test mode is **rejected by mainnet contracts** — it is testnet-only. To go production, see Option C2 below.
+This installs `vram-validator` and `vram-cli` into `/usr/local/bin`.
+
+### Step 2 — Configure your environment
+
+```bash
+# Download the example config
+curl -o ~/.env https://raw.githubusercontent.com/VRAM-AI/vram-validator/main/.env.example
+
+# Edit it — the only required field is your wallet mnemonic
+nano ~/.env
+# Set: VRAMHUB_WALLET_MNEMONIC="your twelve word mnemonic here"
+```
+
+> **New wallet?** You can generate one with `sui keytool generate ed25519`.
+
+> **Already registered as a miner?** A Sui address can only be registered once per role. If your wallet is already registered as a miner (check with `vram-cli status`), create a new wallet for the validator.
+
+### Step 3 — Fund your wallet
+
+You need ~12 SUI for the validator stake (10 SUI) plus gas. Get it free from the faucet:
+
+```bash
+# Replace with your wallet address (shown by: vram-cli status)
+ADDR="0xYOUR_WALLET_ADDRESS"
+for i in $(seq 1 5); do
+  curl -s -X POST https://faucet.testnet.sui.io/v1/gas \
+    -H 'Content-Type: application/json' \
+    -d "{\"FixedAmountRequest\":{\"recipient\":\"${ADDR}\"}}" && sleep 3
+done
+```
+
+### Step 4 — Register on-chain
+
+```bash
+source ~/.env
+vram-cli register-validator
+# Prints: Registered as validator UID=<N>
+```
+
+Set your UID in `~/.env`:
+```bash
+# Add these lines to ~/.env:
+VRAMHUB_VALIDATOR_UID=<N>         # UID from register-validator output
+SLCL_VALIDATOR_UID=<N>
+SLCL_TEST_MODE=true
+SLCL_NITRO_ENCLAVE=false
+SLCL_SKIP_SEAL=true
+```
+
+### Step 5 — Start the validator
+
+```bash
+source ~/.env && vram-validator
+# Expected output:
+#   mode=Simulated  window=<N>  peers=<N>  ...
+```
+
+> Test mode is **rejected by mainnet contracts** — testnet only. For production, see Option C2 below.
 
 ---
 
@@ -182,24 +236,30 @@ RUST_LOG=info VRAMHUB_TEST_MODE=true \
 
 Validators need a Nitro Enclave-capable EC2 instance (`c5.xlarge` minimum, spot ~$0.05/hr).
 
-> **Note:** The enclave build is a one-time step. Once PCR values are registered on-chain, the validator binary handles everything else automatically.
-
-See **[docs/validators/setup.md](docs/validators/setup.md)** for the full guide. The short version:
+Follow Option C1 Steps 1–4 first, then:
 
 ```bash
-# On a c5.xlarge with --enclave-options Enabled=true
-./scripts/build-enclave.sh          # prints PCR0, PCR1, PCR2
+# On the c5.xlarge EC2 (--enclave-options Enabled=true)
+# Build the enclave image — prints PCR0, PCR1, PCR2
+./scripts/build-enclave.sh
 
-# Register the PCR values on-chain
+# Register PCR values on-chain (admin/deployer wallet)
 sui client call \
-  --package 0xaff18bf6... \
+  --package 0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5 \
   --module hparams \
   --function update_pcrs \
-  --args <hparams_object_id> <pcr0> <pcr1> <pcr2>
+  --args <hparams_id> <pcr0> <pcr1> <pcr2>
 
-# Run the validator daemon
-cargo run --release --bin vramhub-validator
+# In ~/.env, change:
+# SLCL_NITRO_ENCLAVE=true
+# SLCL_TEST_MODE=false
+# SLCL_SKIP_SEAL=false
+
+# Start the validator daemon (Nitro mode)
+source ~/.env && vram-validator
 ```
+
+See **[docs/validators/setup.md](docs/validators/setup.md)** for the full enclave build guide.
 
 ---
 
@@ -243,7 +303,7 @@ contracts/          Sui Move contracts (deployed to testnet)
 crates/
   vramhub-core/        shared types, OpenSkill impl, constants — no I/O
   vramhub-chain/       Sui RPC client — all on-chain calls (register, score, reward)
-  vramhub-comms/       Cloudflare R2 client, dataset loader (FineWeb-Edu shards)
+  vramhub-comms/       Walrus storage client, dataset loader (FineWeb-Edu shards)
   vramhub-seal/        Seal IBE client — encrypt/decrypt R2 credentials
   vramhub-adapter/     pluggable training adapters
     src/candle_gpt.rs     nano-GPT 10M transformer (pure Rust, Candle framework)
@@ -282,7 +342,7 @@ docs/
   architecture.md       full system design and trust model
   security.md           security model, known limitations, threat analysis
   incentives.md         OpenSkill scoring and tokenomics math
-  miners/setup.md       miner setup guide (registration, wallet, R2)
+  miners/setup.md       miner setup guide (registration, wallet, Walrus)
   miners/running.md     all training adapters, gradient compression
   validators/           validator + enclave guides
   reference/env-vars.md environment variable reference (all VRAMHUB_* variables)
@@ -308,9 +368,11 @@ paper/
 | Top-K f16 gradient compression | ✅ Ready |
 | VRAMScan explorer + /training page | ✅ Live at www.vram.network |
 | Seal IBE credential privacy | ✅ Configured (testnet key servers) |
-| Validator scoring | ⏳ Needs Nitro enclave (~$36/mo spot) |
-| VRAM token payouts | ⏳ Unblocked once first validator is up |
+| Validator (test mode) | ✅ Live — `vram-cli register-validator` + simulated scoring |
+| Validator (Nitro enclave) | ⏳ Needs `c5.xlarge` + enclave build (~$36/mo spot) |
+| VRAM token payouts | ⏳ Unblocked once first Nitro validator is up |
 | Nitro root CA validation | ⏳ Ed25519 sig verification done; full cert chain pending |
+| GPU marketplace / rental | 🗓 Planned — rent GPU capacity without running a full miner |
 
 ---
 

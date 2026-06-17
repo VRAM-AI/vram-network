@@ -65,6 +65,19 @@ vram-miner
 
 ---
 
+## Roadmap
+
+| Feature | Status |
+|---------|--------|
+| Miner binary (testnet) | ✅ Live |
+| Validator (test mode) | ✅ Live |
+| Validator (Nitro enclave, mainnet) | ⏳ In progress |
+| VRAM token payouts | ⏳ Needs first Nitro validator |
+| `vram-sdk` (builders API) | 🗓 Q3 2026 |
+| **GPU marketplace / rental** | 🗓 Planned — rent GPU capacity on-demand without running a full miner node |
+
+---
+
 ## Build on top of Vram Network
 
 If you want to **post jobs**, **run inference**, or **plug a new model architecture** — wait for `vram-sdk` (Q3 2026) or contact `team@vram.ai` for early-access.
