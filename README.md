@@ -32,7 +32,7 @@ The miner and validator **binaries** are closed-source and distributed separatel
 ## Run a miner
 
 ```bash
-curl -sSL https://www.vram.network/install.sh | sh
+curl -sSL https://www.vram.network/install.sh | bash
 ```
 
 Set your wallet mnemonic in `~/.vramhub/.env` and run `vram-miner`. Full guide: [ONBOARDING.md — Option B](ONBOARDING.md#option-b--connect-a-real-miner-to-testnet-10-minutes).
