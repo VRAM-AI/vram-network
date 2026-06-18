@@ -17,7 +17,7 @@ Sui Move smart contracts for the VRAM decentralized LLM training coordination pr
 
 **Deployer:** `0xb7aaeb31d576814e1b268a43033feccac19a2905a652ad3b42fb5efeb1c772c3`
 **Network:** Sui Testnet (`4c78adac`)
-**Token:** VRAM · symbol `VRAM` · 9 decimals · 500M hard cap
+**Token:** VRAM · symbol `VRAM` · 9 decimals · 21M hard cap
 **Explorer:** https://suiscan.xyz/testnet/object/0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5
 
 ### RewardPool Status
@@ -25,9 +25,9 @@ Sui Move smart contracts for the VRAM decentralized LLM training coordination pr
 | Parameter | Value |
 |-----------|-------|
 | Balance | 6,000,000 VRAM |
-| Emission/window | 1,200 VRAM |
-| Runway | ~5,000 windows (~34 days) |
-| Halving schedule | Every 4 years (governance via `hparams::update_emission`) |
+| Emission/window | 70 VRAM (50 miners + 20 validators) |
+| Runway | ~85,714 windows (~595 days) |
+| Halving | Supply-based: 7M issued → 35 VRAM/window; cap at 10.5M |
 
 ## Seal IBE Key Servers (Testnet)
 

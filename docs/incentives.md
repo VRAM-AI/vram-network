@@ -102,31 +102,27 @@ This ensures validators are incentivized to evaluate all registered miners, not 
 
 ## VRAM Token Emission Schedule
 
-**Token:** VRAM · **Hard cap:** 500,000,000 VRAM · **Decimals:** 9
+**Token:** VRAM · **Hard cap:** 21,000,000 VRAM · **Decimals:** 9
 
-**Window cadence:** 10 minutes → **52,560 windows/year**
+**Window cadence:** 10 minutes → **52,596 windows/year**
 
-The emission schedule follows a TAO/Bitcoin-style halving with 4-year epochs:
+Halving is **supply-based**, not time-based. It triggers when cumulative mining tokens issued cross a threshold — independent of clock time:
 
-| Epoch | Window Range | Duration | Emission/Window | VRAM Emitted | Cumulative |
-|-------|-------------|----------|-----------------|--------------|------------|
-| 1 (Genesis) | 1 – 210,240 | Yr 1–4 | 1,200 VRAM | ~252M | ~252M |
-| 2 | 210,241 – 420,480 | Yr 5–8 | 600 VRAM | ~126M | ~378M |
-| 3 | 420,481 – 630,720 | Yr 9–12 | 300 VRAM | ~63M | ~441M |
-| 4 | 630,721 – 840,960 | Yr 13–16 | 150 VRAM | ~31.5M | ~472M |
-| 5+ | … | … | halving… | ~28M… | → 500M |
+| Phase | Supply Threshold | Est. Duration | Emission/Window | Phase Total | Cumulative |
+|-------|-----------------|---------------|-----------------|-------------|------------|
+| 1 (Genesis) | 0 → 7M issued | ~1.9 years | 70 VRAM | 7.0M | 7.0M |
+| 2 | 7M → 10.5M (cap) | ~1.9 more years | 35 VRAM | 3.5M | 10.5M |
 
-The geometric series converges to **~504M ≈ 500M** (governance will halt minting at 500M).
+Mining allocation exhausts at **10.5M VRAM** (50% of hard cap). `can_emit()` returns false at that point and emission stops permanently.
 
-Halving is governance-controlled via `hparams::update_emission` — the deployer calls this at each epoch boundary.
+The remaining 50% of supply is pre-minted at TGE: Treasury 30% (6m cliff, 48m vest) · Team 8% (12m cliff, 36m vest) · Liquidity 7% (instant) · Airdrop 5%.
 
-**Distribution split per window (v0.5+):**
+**Distribution split per window:**
 
-| Recipient | Share | Amount (Genesis) | Mechanism |
-|-----------|-------|-----------------|-----------|
-| Miners | 72% | 864 VRAM | Proportional to OpenSkill normalized weight $w_i$ |
-| Validators | 18% | 216 VRAM | Proportional to stake × submission completeness |
-| Protocol treasury | 10% | 120 VRAM | Fixed address, funds future development |
+| Recipient | BPS | Amount (Phase 1) | Mechanism |
+|-----------|-----|-----------------|-----------|
+| Miners | 7143 | ~50 VRAM | Proportional to OpenSkill normalized weight $w_i$ |
+| Validators | 2857 | ~20 VRAM | Proportional to stake × submission completeness |
 
 > **Note:** v0.4 (current) sends 100% to miners. The 72/18/10 split ships in v0.5 alongside the validator reward module.
 
