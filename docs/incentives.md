@@ -115,7 +115,7 @@ Halving is **supply-based**, not time-based. It triggers when cumulative mining 
 
 Mining allocation exhausts at **10.5M VRAM** (50% of hard cap). `can_emit()` returns false at that point and emission stops permanently.
 
-The remaining 50% of supply is pre-minted at TGE: Treasury 30% (6m cliff, 48m vest) · Team 8% (12m cliff, 36m vest) · Liquidity 7% (instant) · Airdrop 5%.
+The remaining 50% of supply is pre-minted at TGE: Treasury 25% (6m cliff, 48m vest) · Strategic Investors 5% (SAFT lock-up) · Team 8% (12m cliff, 36m vest) · Liquidity 7% (instant) · Airdrop 5%.
 
 **Distribution split per window:**
 

@@ -152,7 +152,7 @@ Full threat model and trust assumptions: [docs/architecture.md](docs/architectur
 
 - **Hard cap**: 21,000,000 VRAM
 - **Mining pool (50%)**: emitted per-window, supply-based halving — Phase 1: 70 VRAM/window → Phase 2: 35 VRAM/window
-- **TGE pre-mint (50%)**: Treasury 30% (6m cliff, 48m vest) · Team 8% (12m cliff, 36m vest) · Liquidity 7% (instant) · Airdrop 5% (converts from testnet points)
+- **TGE pre-mint (50%)**: Treasury 25% (6m cliff, 48m vest) · Investors 5% (SAFT lock-up) · Team 8% (12m cliff, 36m vest) · Liquidity 7% (instant) · Airdrop 5% (converts from testnet points)
 - **Validator bonding**: 2,100 → 21,000 VRAM burned per slot (4 tiers, max 500 validators)
 
 Full model: [docs/incentives.md](docs/incentives.md)
