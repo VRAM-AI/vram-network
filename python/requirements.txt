@@ -1,0 +1,20 @@
+# VRAM Network — Python sidecar requirements
+# Install with: pip install -r python/requirements.txt
+
+# Core ML
+torch>=2.3.0
+transformers>=4.44.0
+datasets>=2.18.0            # FineWeb-edu streaming (optional but recommended)
+accelerate>=0.30.0          # device_map, bf16, multi-GPU
+
+# 8-bit optimizer — required for large models (≥ 1B params) on consumer GPUs.
+# Reduces AdamW optimizer state from ~16 GB to ~4 GB on a 2B model.
+# On Linux: pip install bitsandbytes
+# On Windows: pip install bitsandbytes (CPU-only build, no GPU 8-bit on Windows)
+bitsandbytes>=0.43.0
+
+# Web server
+flask>=3.0.0
+
+# Utilities
+numpy>=1.24.0
