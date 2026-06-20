@@ -24,7 +24,7 @@ The key insight: we don't trust miners to self-report results. A Nitro enclave m
 
 | Goal | How |
 |---|---|
-| **Run a miner** | `curl -sSL https://www.vram.network/install.sh \| sh` (closed-source signed binary; freely installable) |
+| **Run a miner** | `curl -sSL https://www.vram.network/install.sh \| bash` (closed-source signed binary; freely installable) |
 | **Run a validator** | `curl -sSf https://raw.githubusercontent.com/VRAM-AI/vram-validator/main/install.sh \| bash` — test mode works on any Linux VPS; Nitro enclave requires AWS `c5.xlarge` |
 | **Post a training job** | https://www.vram.network/training or `vramhub-cli job post` |
 | **Try the demo** | https://www.vram.network/demotrain — upload a dataset, see Walrus integration + cost simulator + animated training |
@@ -114,19 +114,34 @@ sui move test
 - Python 3.8+ and pip
 - A Sui wallet with testnet SUI (free from faucet)
 
-### Step 1 — Run the installer
+### Step 1 — Pre-install Python dependencies
+
+On Debian/Ubuntu systems (including RunPod), the installer's pip step may fail because system-installed packages (`blinker`, `flask`) lack RECORD files. Pre-install them first to avoid this:
 
 ```bash
-curl -sSL https://www.vram.network/install.sh | sh
+pip3 install --ignore-installed \
+  "transformers>=4.38.0" "datasets>=2.18.0" "accelerate>=0.27.0" \
+  "flask>=3.0.0" "numpy>=1.24.0"
 ```
 
-The script downloads the `vramhub-miner` binary, installs the Python sidecar, creates `~/.vramhub/.env` with all testnet contract IDs pre-filled, and creates a `vram-miner` launcher in `~/.local/bin`.
+Then run the installer (pip step passes because packages are already present):
+
+```bash
+curl -sSL https://www.vram.network/install.sh | bash
+```
+
+The script downloads the `vramhub-miner` binary, installs the Python sidecar, creates `~/.vramhub/.env` with all testnet contract IDs pre-filled, and creates a `~/.vramhub/start-miner.sh` launcher.
 
 ### Step 2 — Set your wallet mnemonic
 
 ```bash
 nano ~/.vramhub/.env
-# Set: VRAMHUB_WALLET_MNEMONIC="your twelve word mnemonic phrase here"
+```
+
+Set your mnemonic — **quote the value** (multi-word values must be quoted for the launcher's `source` to work):
+
+```
+VRAMHUB_WALLET_MNEMONIC="your twelve word mnemonic phrase here"
 ```
 
 Get a free Sui wallet if you don't have one:
@@ -137,27 +152,39 @@ sui keytool generate ed25519
 
 > **Security:** Keep your mnemonic private — it controls your wallet and signs all on-chain operations.
 
-### Step 3 — Start mining
+### Step 3 — Set the model to match the active training job
 
-```bash
-vram-miner                        # default model (gpt2, any GPU/CPU)
-vram-miner --model gpt2-xl        # larger model, more rewards
-vram-miner --device cuda:0        # explicit GPU selection
+Check the active training job at [vram.network/training](https://www.vram.network/training). The miner's Python sidecar must load the **same model** as the posted job. Edit `~/.vramhub/.env`:
+
+```
+VRAMHUB_MODEL=google/gemma-4-E2B-it
 ```
 
-The miner auto-registers on first startup (saves UID to `~/.vramhub/.vramhub-uid`). You'll see your UID printed — use it to track your score on [VRAMScan](https://www.vram.network).
-
-**To use a custom HuggingFace model** (bring your own PyTorch model):
+For gated models like Gemma, you need a HuggingFace token with access:
 
 ```bash
-# Terminal 1 — start the Python sidecar with your model
-python3 ~/.vramhub/vram_trainer.py --model mistralai/Mistral-7B-v0.1 --device cuda --port 17070
-
-# Terminal 2 — miner picks it up automatically (VRAMHUB_SIDECAR_URL is pre-set)
-vram-miner
+# Accept the license at: https://huggingface.co/google/gemma-4-E2B-it
+# Then create a token at: https://huggingface.co/settings/tokens
+hf auth login
 ```
 
-Supported: any `AutoModelForCausalLM`-compatible HuggingFace model.
+> **Note:** `huggingface-cli` is deprecated on newer systems — use `hf auth login` instead.
+
+### Step 4 — Start mining
+
+```bash
+~/.vramhub/start-miner.sh
+```
+
+The miner auto-registers on first startup. You'll see your UID printed — track your score on [VRAMScan](https://www.vram.network).
+
+**Logs and control:**
+```bash
+~/.vramhub/start-miner.sh --logs   # tail live logs
+~/.vramhub/start-miner.sh --stop   # stop miner + sidecar
+```
+
+> Gemma (~16 GB) takes a few minutes to download on first run. The sidecar prints `VRAM sidecar listening on 0.0.0.0:17070` when ready.
 
 ---
 
@@ -279,7 +306,8 @@ See **[docs/validators/setup.md](docs/validators/setup.md)** for the full enclav
 
 | Allocation | % | VRAM | Vesting |
 |------------|---|------|---------|
-| Treasury | 30% | 6,300,000 | 6m cliff, 48m linear |
+| Treasury | 25% | 5,250,000 | 6m cliff, 48m linear |
+| Strategic Investors | 5% | 1,050,000 | TGE lock-up + linear vest (per SAFT terms) |
 | Team | 8% | 1,680,000 | 12m cliff, 36m linear |
 | Liquidity | 7% | 1,470,000 | 100% unlocked at TGE |
 | Airdrop | 5% | 1,050,000 | Instant at TGE (converts from testnet contribution points) |
