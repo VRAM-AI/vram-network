@@ -107,6 +107,11 @@ log.info(f"Loading {args.model!r} …")
 _load_kwargs: dict = {
     "device_map": {"": DEVICE} if DEVICE.type != "cpu" else "cpu",
     "low_cpu_mem_usage": True,
+    # Force sdpa attention: avoids flex_attention entirely (which requires
+    # AuxRequest from torch≥2.9). sdpa is well-supported on torch 2.8+ and
+    # faster than eager. The AuxRequest=None stub in flex_attention.py is then
+    # import-only scaffolding that can never be reached at runtime.
+    "attn_implementation": "sdpa",
 }
 # transformers ≥5.x renamed torch_dtype → dtype; fall back for older builds
 import inspect as _inspect
