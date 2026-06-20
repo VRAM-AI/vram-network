@@ -132,7 +132,7 @@ curl -sSL https://www.vram.network/install.sh | bash
 
 The script downloads the `vramhub-miner` binary, installs the Python sidecar, creates `~/.vramhub/.env` with all testnet contract IDs pre-filled, and creates a `~/.vramhub/start-miner.sh` launcher.
 
-### Step 2 — Set your wallet mnemonic
+### Step 2 — Set your wallet mnemonic and verify demo mode
 
 ```bash
 nano ~/.vramhub/.env
@@ -143,6 +143,15 @@ Set your mnemonic — **quote the value** (multi-word values must be quoted for 
 ```
 VRAMHUB_WALLET_MNEMONIC="your twelve word mnemonic phrase here"
 ```
+
+Also confirm these two lines are present (they should be — added by installer):
+
+```
+VRAMHUB_STORAGE_BACKEND=walrus
+VRAMHUB_DEMO_MODE=true
+```
+
+> If you see `Error: Missing environment variable: VRAMHUB_AES_FALLBACK_KEY`, it means `VRAMHUB_DEMO_MODE=true` is missing from your `.env`. Add it and restart.
 
 Get a free Sui wallet if you don't have one:
 ```bash
