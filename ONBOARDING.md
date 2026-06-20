@@ -114,26 +114,15 @@ sui move test
 - Python 3.8+ and pip
 - A Sui wallet with testnet SUI (free from faucet)
 
-### Step 1 — Pre-install Python dependencies
-
-On Debian/Ubuntu systems (including RunPod), the installer's pip step may fail because system-installed packages (`blinker`, `flask`) lack RECORD files. Pre-install them first to avoid this:
-
-```bash
-pip3 install --ignore-installed \
-  "transformers>=5.0.0" \
-  "huggingface-hub>=1.5.0,<2.0" \
-  "datasets>=2.18.0" \
-  "accelerate>=0.27.0" \
-  "flask>=3.0.0" \
-  "numpy>=1.24.0" \
-  "einops>=0.7.0"
-```
-
-Then run the installer (pip step passes because packages are already present):
+### Step 1 — Run the installer
 
 ```bash
 curl -sSL https://www.vram.network/install.sh | bash
 ```
+
+The script downloads the `vramhub-miner` binary, installs the Python sidecar, creates `~/.vramhub/.env` with all testnet contract IDs pre-filled, and creates a `~/.vramhub/start-miner.sh` launcher.
+
+> **RunPod / pre-built GPU images:** The installer automatically removes `tensorboard` after installing dependencies. This is required: transformers 5.x has a known bug ([#45542](https://github.com/huggingface/transformers/issues/45542)) where tensorboard's presence causes the sidecar to crash with `ValueError: Backend should be defined in the BACKENDS_MAPPING. Offending backend: tensorflow_text`. Miners don't use tensorboard, so it's safe to remove.
 
 The script downloads the `vramhub-miner` binary, installs the Python sidecar, creates `~/.vramhub/.env` with all testnet contract IDs pre-filled, and creates a `~/.vramhub/start-miner.sh` launcher.
 
