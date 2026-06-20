@@ -56,6 +56,13 @@ from typing import Optional, List, Dict
 
 import torch
 from flask import Flask, jsonify, request
+# USE_TF=0 must be set before importing transformers. It prevents
+# is_tf_available() from returning True, which keeps tensorflow_text out of
+# _import_structure entirely and avoids the 5.9+ BACKENDS_MAPPING crash
+# (huggingface/transformers#46178). AutoTokenizer is the trigger: it registers
+# the TF BERT tokenizer whose backend declaration references tensorflow_text.
+import os as _os
+_os.environ.setdefault("USE_TF", "0")
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -108,14 +115,29 @@ if "dtype" in _fp_sig.parameters:
     _load_kwargs["dtype"] = DTYPE
 else:
     _load_kwargs["torch_dtype"] = DTYPE
-model = AutoModelForCausalLM.from_pretrained(args.model, **_load_kwargs)
+
+# Gemma 4 and other multimodal checkpoints may not register in
+# AutoModelForCausalLM. Try causal LM first; fall back to multimodal.
+try:
+    model = AutoModelForCausalLM.from_pretrained(args.model, **_load_kwargs)
+except (ValueError, KeyError, AttributeError, OSError) as _e:
+    log.warning(f"AutoModelForCausalLM failed ({_e!r}) — retrying with AutoModelForMultimodalLM")
+    from transformers import AutoModelForMultimodalLM
+    model = AutoModelForMultimodalLM.from_pretrained(args.model, **_load_kwargs)
+
 model.train()
 
 if hasattr(model, "gradient_checkpointing_enable"):
     model.gradient_checkpointing_enable()
     log.info("Gradient checkpointing enabled")
 
-tokenizer = AutoTokenizer.from_pretrained(args.model)
+# AutoProcessor handles multimodal models that don't support plain AutoTokenizer
+try:
+    tokenizer = AutoTokenizer.from_pretrained(args.model)
+except Exception as _e:
+    log.warning(f"AutoTokenizer failed ({_e!r}) — retrying with AutoProcessor")
+    from transformers import AutoProcessor
+    tokenizer = AutoProcessor.from_pretrained(args.model)
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
