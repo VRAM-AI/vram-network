@@ -3,10 +3,7 @@
 
 # Core ML
 torch>=2.3.0
-# Pin to 4.x: transformers 5.x imports torchvision unconditionally, which breaks
-# on cloud GPU images (RunPod, Vast) where torchvision was compiled against the
-# system torch. Gemma 4 support was added in 4.49.
-transformers>=4.49.0,<5.0.0
+transformers>=5.0.0
 datasets>=2.18.0            # FineWeb-edu streaming (optional but recommended)
 accelerate>=0.30.0          # device_map, bf16, multi-GPU
 einops>=0.7.0               # required by Gemma 4 attention impl
