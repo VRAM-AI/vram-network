@@ -18,7 +18,7 @@ pub struct ChainConfig {
     pub enclave_registry_id: String,
     pub hparams_id: String,
     pub reward_pool_id: String,
-    /// TrainingJobBoard shared object ID (SLCL_TRAINING_JOB_BOARD_ID)
+    /// TrainingJobBoard shared object ID (VRAMHUB_TRAINING_JOB_BOARD_ID)
     pub training_job_board_id: String,
     /// Seal key server on-chain object IDs (comma-separated)
     pub seal_key_server_ids: Vec<String>,
@@ -51,7 +51,7 @@ impl ChainConfig {
             enclave_registry_id: env("VRAMHUB_ENCLAVE_REGISTRY_ID")?,
             hparams_id: env("VRAMHUB_HPARAMS_ID")?,
             reward_pool_id: env("VRAMHUB_REWARD_POOL_ID").unwrap_or_default(),
-            training_job_board_id: env("SLCL_TRAINING_JOB_BOARD_ID").unwrap_or_default(),
+            training_job_board_id: env("VRAMHUB_TRAINING_JOB_BOARD_ID").unwrap_or_default(),
             seal_key_server_ids,
             seal_threshold: env("VRAMHUB_SEAL_THRESHOLD")
                 .unwrap_or_else(|_| "2".to_string())

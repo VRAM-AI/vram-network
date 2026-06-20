@@ -44,7 +44,7 @@ mod integration_tests {
             enclave_registry_id: std::env::var("VRAMHUB_ENCLAVE_REGISTRY_ID").unwrap_or_default(),
             hparams_id: std::env::var("VRAMHUB_HPARAMS_ID").unwrap_or_default(),
             reward_pool_id: std::env::var("VRAMHUB_REWARD_POOL_ID").unwrap_or_default(),
-            training_job_board_id: std::env::var("SLCL_TRAINING_JOB_BOARD_ID").unwrap_or_default(),
+            training_job_board_id: std::env::var("VRAMHUB_TRAINING_JOB_BOARD_ID").unwrap_or_default(),
             seal_key_server_ids: vec![],
             seal_threshold: 2,
         })
