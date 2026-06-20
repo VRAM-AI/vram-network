@@ -174,6 +174,26 @@ Check the active training job at [vram.network/training](https://www.vram.networ
 VRAMHUB_MODEL=google/gemma-4-E2B-it
 ```
 
+**Gemma 4 requires PyTorch ≥ 2.7.0.** If your environment has an older torch (common on pre-built cloud images), you'll see:
+
+```
+ImportError: cannot import name 'AuxRequest' from 'torch.nn.attention.flex_attention'
+```
+
+Fix: upgrade torch and torchvision together from the PyTorch index:
+
+```bash
+# Check what you have:
+python3 -c "import torch; print(torch.__version__)"
+python3 -c "from torch.nn.attention.flex_attention import AuxRequest; print('OK')"
+
+# Upgrade if AuxRequest is missing (adjust cu121/cu128 for your CUDA version):
+pip3 install --ignore-installed torch torchvision \
+  --index-url https://download.pytorch.org/whl/cu128
+```
+
+> **While upgrading:** set `VRAMHUB_MODEL=gpt2` to verify the rest of the stack works. GPT-2 trains on any torch version and needs no HuggingFace login.
+
 For gated models like Gemma, you need a HuggingFace token with access:
 
 ```bash

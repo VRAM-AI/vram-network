@@ -97,12 +97,18 @@ log.info(f"Device: {DEVICE}  dtype: {DTYPE}")
 # ── Model ─────────────────────────────────────────────────────────────────────
 
 log.info(f"Loading {args.model!r} …")
-model = AutoModelForCausalLM.from_pretrained(
-    args.model,
-    torch_dtype=DTYPE,
-    device_map={"": DEVICE} if DEVICE.type != "cpu" else "cpu",
-    low_cpu_mem_usage=True,
-)
+_load_kwargs: dict = {
+    "device_map": {"": DEVICE} if DEVICE.type != "cpu" else "cpu",
+    "low_cpu_mem_usage": True,
+}
+# transformers ≥5.x renamed torch_dtype → dtype; fall back for older builds
+import inspect as _inspect
+_fp_sig = _inspect.signature(AutoModelForCausalLM.from_pretrained)
+if "dtype" in _fp_sig.parameters:
+    _load_kwargs["dtype"] = DTYPE
+else:
+    _load_kwargs["torch_dtype"] = DTYPE
+model = AutoModelForCausalLM.from_pretrained(args.model, **_load_kwargs)
 model.train()
 
 if hasattr(model, "gradient_checkpointing_enable"):
