@@ -120,8 +120,13 @@ On Debian/Ubuntu systems (including RunPod), the installer's pip step may fail b
 
 ```bash
 pip3 install --ignore-installed \
-  "transformers>=4.38.0" "datasets>=2.18.0" "accelerate>=0.27.0" \
-  "flask>=3.0.0" "numpy>=1.24.0"
+  "transformers>=5.0.0" \
+  "huggingface-hub>=1.5.0,<2.0" \
+  "datasets>=2.18.0" \
+  "accelerate>=0.27.0" \
+  "flask>=3.0.0" \
+  "numpy>=1.24.0" \
+  "einops>=0.7.0"
 ```
 
 Then run the installer (pip step passes because packages are already present):
