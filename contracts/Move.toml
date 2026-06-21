@@ -1,10 +1,11 @@
 [package]
 name = "slcl"
-version = "0.5.0"
+version = "0.7.0"
 edition = "2024"
+published-at = "0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5"
 
 [addresses]
-slcl = "0x0"
+slcl = "0xaff18bf6286047126901610d758d8fd111c9215a6e46abc704b6a0be838badd5"
 sui = "0x2"
 std = "0x1"
 
