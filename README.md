@@ -177,7 +177,7 @@ Full model: [docs/incentives.md](docs/incentives.md)
 - **Contracts** (`contracts/`) — MIT
 - **SDK crates** (`vramhub-*/`) — Apache 2.0
 - **Validator installer** ([VRAM-AI/vram-validator](https://github.com/VRAM-AI/vram-validator)) — MIT
-- **Miner / Validator binaries** — proprietary; freely installable under [LICENSE-BINARIES.md](LICENSE-BINARIES.md)
+- **Miner / Validator binaries — proprietary; installable via the official installer scripts (see ONBOARDING.md)
 
 Security issues: email security@vram.ai — see [SECURITY.md](SECURITY.md). Do not open public issues for vulnerabilities.
 
