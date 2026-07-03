@@ -20,6 +20,8 @@ pub struct ChainConfig {
     pub reward_pool_id: String,
     /// TrainingJobBoard shared object ID (VRAMHUB_TRAINING_JOB_BOARD_ID)
     pub training_job_board_id: String,
+    /// GradientRegistry shared object ID (VRAMHUB_GRADIENT_REGISTRY_ID)
+    pub gradient_registry_id: String,
     /// Seal key server on-chain object IDs (comma-separated)
     pub seal_key_server_ids: Vec<String>,
     pub seal_threshold: u8,
@@ -52,6 +54,7 @@ impl ChainConfig {
             hparams_id: env("VRAMHUB_HPARAMS_ID")?,
             reward_pool_id: env("VRAMHUB_REWARD_POOL_ID").unwrap_or_default(),
             training_job_board_id: env("VRAMHUB_TRAINING_JOB_BOARD_ID").unwrap_or_default(),
+            gradient_registry_id: env("VRAMHUB_GRADIENT_REGISTRY_ID").unwrap_or_default(),
             seal_key_server_ids,
             seal_threshold: env("VRAMHUB_SEAL_THRESHOLD")
                 .unwrap_or_else(|_| "2".to_string())

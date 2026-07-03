@@ -475,6 +475,111 @@ impl SuiChainClient {
         Ok(())
     }
 
+    /// Register a gradient's storage ref in the GradientRegistry for a window.
+    ///
+    /// Called by the miner after uploading a gradient to Walrus or R2.
+    /// No-ops if `VRAMHUB_GRADIENT_REGISTRY_ID` is not set.
+    pub async fn submit_gradient_to_registry(
+        &self,
+        window: u64,
+        miner_uid: u64,
+        storage_ref: &str,
+        content_hash: &[u8],
+        encryption_kind: u8,
+    ) -> Result<(), VramhubError> {
+        if self.config.gradient_registry_id.is_empty() {
+            tracing::debug!("VRAMHUB_GRADIENT_REGISTRY_ID not set, skipping gradient registration");
+            return Ok(());
+        }
+
+        let package_id = object_id(&self.config.package_id)?;
+        let registry_id = object_id(&self.config.gradient_registry_id)?;
+        let registry_version = self.get_shared_object_version(registry_id).await?;
+
+        let clock_id = ObjectID::from_hex_literal(
+            "0x0000000000000000000000000000000000000000000000000000000000000006",
+        )
+        .map_err(|e| VramhubError::ConfigError(e.to_string()))?;
+        let clock_ver = self.get_shared_object_version(clock_id).await?;
+
+        let mut builder = ProgrammableTransactionBuilder::new();
+
+        let registry_arg = builder
+            .input(CallArg::Object(ObjectArg::SharedObject {
+                id: registry_id,
+                initial_shared_version: registry_version,
+                mutability: SharedObjectMutability::Mutable,
+            }))
+            .map_err(|e| VramhubError::Internal(e.to_string()))?;
+
+        let clock_arg = builder
+            .input(CallArg::Object(ObjectArg::SharedObject {
+                id: clock_id,
+                initial_shared_version: clock_ver,
+                mutability: SharedObjectMutability::Immutable,
+            }))
+            .map_err(|e| VramhubError::Internal(e.to_string()))?;
+
+        let window_arg = builder
+            .input(CallArg::Pure(bcs::to_bytes(&window).map_err(|e| {
+                VramhubError::SerializationError(e.to_string())
+            })?))
+            .map_err(|e| VramhubError::Internal(e.to_string()))?;
+
+        let uid_arg = builder
+            .input(CallArg::Pure(bcs::to_bytes(&miner_uid).map_err(|e| {
+                VramhubError::SerializationError(e.to_string())
+            })?))
+            .map_err(|e| VramhubError::Internal(e.to_string()))?;
+
+        let ref_arg = builder
+            .input(CallArg::Pure(
+                bcs::to_bytes(&storage_ref.as_bytes().to_vec())
+                    .map_err(|e| VramhubError::SerializationError(e.to_string()))?,
+            ))
+            .map_err(|e| VramhubError::Internal(e.to_string()))?;
+
+        let hash_arg = builder
+            .input(CallArg::Pure(
+                bcs::to_bytes(&content_hash.to_vec())
+                    .map_err(|e| VramhubError::SerializationError(e.to_string()))?,
+            ))
+            .map_err(|e| VramhubError::Internal(e.to_string()))?;
+
+        let enc_arg = builder
+            .input(CallArg::Pure(bcs::to_bytes(&encryption_kind).map_err(
+                |e| VramhubError::SerializationError(e.to_string()),
+            )?))
+            .map_err(|e| VramhubError::Internal(e.to_string()))?;
+
+        builder.programmable_move_call(
+            package_id,
+            Identifier::new("gradient_registry")
+                .map_err(|e| VramhubError::Internal(e.to_string()))?,
+            Identifier::new("submit_gradient")
+                .map_err(|e| VramhubError::Internal(e.to_string()))?,
+            vec![],
+            vec![
+                registry_arg,
+                window_arg,
+                uid_arg,
+                ref_arg,
+                hash_arg,
+                enc_arg,
+                clock_arg,
+            ],
+        );
+
+        self.execute_ptb(builder).await?;
+        tracing::info!(
+            window,
+            miner_uid,
+            storage_ref,
+            "Gradient registered on-chain"
+        );
+        Ok(())
+    }
+
     /// Register a Nautilus enclave on-chain (one-time, governance-gated).
     ///
     /// Requires the EnclaveAdminCap to be in the signing wallet.

@@ -8,6 +8,7 @@ python = ["pyo3"]
 
 [dependencies]
 vramhub-core = { path = "../vramhub-core" }
+vramhub-seal = { path = "../vramhub-seal" }
 sui-sdk = { workspace = true }
 sui-types = { workspace = true }
 sui-keys = { workspace = true }
