@@ -171,7 +171,7 @@ Full model: [docs/incentives.md](docs/incentives.md)
 | GPU marketplace / rental | 🗓 Planned |
 
 ---
-
+ 
 ## License
 
 - **Contracts** (`contracts/`) — MIT
