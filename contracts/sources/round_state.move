@@ -17,7 +17,7 @@ module slcl::round_state {
     use std::string::String;
     use std::option::{Self, Option};
 
-    const E_NOT_IN_PUT_WINDOW: u64 = 1;
+    // const E_NOT_IN_PUT_WINDOW: u64 = 1;
     const E_UNAUTHORIZED:     u64 = 3;
     const E_NO_AGGREGATOR: u64 = 4;
     const E_BAD_SIGNATURE: u64 = 5;
@@ -62,7 +62,7 @@ module slcl::round_state {
             put_window_open_ms: 480_000,
             rounds: table::new(ctx),
             admin: tx_context::sender(ctx),
-            aggregator_pubkey: vector::empty(),
+            aggregator_pubkey: vector[],
         });
     }
 
@@ -185,7 +185,7 @@ module slcl::round_state {
         if (table::contains(&state.rounds, window)) {
             table::borrow(&state.rounds, window).top_g_peers
         } else {
-            vector::empty()
+            vector[]
         }
     }
 
@@ -196,7 +196,7 @@ module slcl::round_state {
                 aggregation_r2_path: option::none(),
                 checkpoint_r2_path: option::none(),
                 checkpoint_hash: option::none(),
-                top_g_peers: vector::empty(),
+                top_g_peers: vector[],
                 is_finalized: false,
             });
         };

@@ -18,11 +18,11 @@ module slcl::peer_registry {
     const E_ALREADY_REGISTERED: u64 = 1;
     const E_NOT_REGISTERED: u64 = 2;
     const E_INSUFFICIENT_STAKE: u64 = 3;
-    const E_UNAUTHORIZED: u64 = 4;
-    const E_INVALID_PEER_TYPE: u64 = 5;
+    // const E_UNAUTHORIZED: u64 = 4;
+    // const E_INVALID_PEER_TYPE: u64 = 5;
 
     const PEER_TYPE_MINER: u8 = 0;
-    const PEER_TYPE_VALIDATOR: u8 = 1;
+    // const PEER_TYPE_VALIDATOR: u8 = 1;
 
     public struct PeerRegistry has key {
         id: UID,

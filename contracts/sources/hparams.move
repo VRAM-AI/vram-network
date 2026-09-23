@@ -19,7 +19,7 @@ module slcl::hparams {
     use sui::tx_context::{Self, TxContext};
     use sui::transfer;
 
-    const E_UNAUTHORIZED: u64 = 1;
+    // const E_UNAUTHORIZED: u64 = 1;
     const E_BPS_MUST_SUM_10000: u64 = 2;
 
     // ── Default emission ───────────────────────────────────────────────────────
@@ -156,9 +156,9 @@ module slcl::hparams {
             early_bonus_multiplier:  EARLY_BONUS_MULTIPLIER_DEFAULT,
             early_bonus_duration_ms: EARLY_BONUS_DURATION_MS_DEFAULT,
 
-            expected_pcr0: vector::empty(),
-            expected_pcr1: vector::empty(),
-            expected_pcr2: vector::empty(),
+            expected_pcr0: vector[],
+            expected_pcr1: vector[],
+            expected_pcr2: vector[],
 
             admin: tx_context::sender(ctx),
         };

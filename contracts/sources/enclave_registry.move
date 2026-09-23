@@ -19,9 +19,9 @@ module slcl::enclave_registry {
     use sui::table::{Self, Table};
     use sui::event;
 
-    const E_ALREADY_REGISTERED: u64 = 1;
+    // const E_ALREADY_REGISTERED: u64 = 1;
     const E_PCR_MISMATCH: u64 = 2;
-    const E_ATTESTATION_INVALID: u64 = 3;
+    // const E_ATTESTATION_INVALID: u64 = 3;
     const E_NOT_REGISTERED: u64 = 4;
     const E_UNAUTHORIZED: u64 = 5;
 
@@ -64,9 +64,9 @@ module slcl::enclave_registry {
         let registry = EnclaveRegistry {
             id: object::new(ctx),
             enclaves: table::new(ctx),
-            expected_pcr0: vector::empty(),
-            expected_pcr1: vector::empty(),
-            expected_pcr2: vector::empty(),
+            expected_pcr0: vector[],
+            expected_pcr1: vector[],
+            expected_pcr2: vector[],
             admin: tx_context::sender(ctx),
         };
         transfer::share_object(registry);

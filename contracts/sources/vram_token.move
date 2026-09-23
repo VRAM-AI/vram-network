@@ -23,7 +23,7 @@ module slcl::vram_token {
     use sui::coin::{Self, TreasuryCap};
     use sui::tx_context::{Self, TxContext};
     use sui::transfer;
-
+    use sui::coin_registry;
     // ── Allocation constants (with 9 decimals) ─────────────────────────────────
 
     /// 10,500,000 VRAM — 50% of 21M hard cap.
@@ -48,12 +48,12 @@ module slcl::vram_token {
 
     // ── Vesting schedule constants (in ms) ────────────────────────────────────
 
-    const TEAM_CLIFF_MS: u64       = 31_536_000_000;  // 12 months
-    const TEAM_VEST_MS: u64        = 94_608_000_000;  // 36 months linear
-    const TREASURY_CLIFF_MS: u64   = 15_768_000_000;  // 6 months
-    const TREASURY_VEST_MS: u64    = 126_144_000_000; // 48 months linear
-    const AIRDROP_CLIFF_MS: u64    = 0;               // no cliff
-    const AIRDROP_VEST_MS: u64     = 0;               // instant at TGE conversion
+    // const TEAM_CLIFF_MS: u64       = 31_536_000_000;  // 12 months
+    // const TEAM_VEST_MS: u64        = 94_608_000_000;  // 36 months linear
+    // const TREASURY_CLIFF_MS: u64   = 15_768_000_000;  // 6 months
+    // const TREASURY_VEST_MS: u64    = 126_144_000_000; // 48 months linear
+    // const AIRDROP_CLIFF_MS: u64    = 0;               // no cliff
+    // const AIRDROP_VEST_MS: u64     = 0;               // instant at TGE conversion
 
     // ── Testnet airdrop pool ───────────────────────────────────────────────────
 
@@ -68,20 +68,41 @@ module slcl::vram_token {
     #[test_only]
     public fun init_for_testing(ctx: &mut TxContext) { init(VRAM_TOKEN {}, ctx) }
 
-    fun init(witness: VRAM_TOKEN, ctx: &mut TxContext) {
-        let (treasury_cap, metadata) = coin::create_currency(
-            witness,
-            9,
-            b"VRAM",
-            b"VRAM",
-            b"VRAM distributed LLM training reward token",
-            std::option::none(),
-            ctx,
-        );
 
-        transfer::public_freeze_object(metadata);
-        transfer::public_transfer(treasury_cap, tx_context::sender(ctx));
-    }
+
+     fun init(witness: VRAM_TOKEN, ctx: &mut TxContext) {
+    let (initializer, treasury_cap) = coin_registry::new_currency_with_otw(
+        witness,
+        9,
+        b"VRAM".to_string(),
+        b"VRAM".to_string(),
+        b"VRAM distributed LLM training reward token".to_string(),
+        b"".to_string(),
+        ctx,
+    );
+
+    coin_registry::finalize_and_delete_metadata_cap(initializer, ctx);
+
+    transfer::public_transfer(treasury_cap, tx_context::sender(ctx));
+}
+
+// @deprecated
+    // public fun init_for_testing(ctx: &mut TxContext) { init(VRAM_TOKEN {}, ctx) }
+
+    // fun init(witness: VRAM_TOKEN, ctx: &mut TxContext) {
+    //     let (treasury_cap, metadata) = coin::create_currency(
+    //         witness,
+    //         9,
+    //         b"VRAM",
+    //         b"VRAM",
+    //         b"VRAM distributed LLM training reward token",
+    //         std::option::none(),
+    //         ctx,
+    //     );
+
+    //     transfer::public_freeze_object(metadata);
+    //     transfer::public_transfer(treasury_cap, tx_context::sender(ctx));
+    // }
 
     /// Mint new VRAM tokens.
     /// Called by reward_distributor.move (per window) and by the deployer at TGE

@@ -358,7 +358,7 @@ module slcl::training_jobs {
             miner_address: option::none(),
             miner_uid: 0,
             result_blob_id: std::string::utf8(b""),
-            result_hash: vector::empty(),
+            result_hash: vector[],
         };
 
         table::add(&mut board.jobs, job_id, job);
