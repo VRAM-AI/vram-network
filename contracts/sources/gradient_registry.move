@@ -100,7 +100,7 @@ module slcl::gradient_registry {
         // Lazily create the window bucket on first submission.
         if (!table::contains(&registry.windows, window)) {
             table::add(&mut registry.windows, window, WindowSubmissions {
-                submissions: vector::empty(),
+                submissions: vector[],
                 committed: false,
             });
         };
@@ -155,7 +155,7 @@ module slcl::gradient_registry {
         window:   u64,
     ): vector<GradientSubmission> {
         if (!table::contains(&registry.windows, window)) {
-            return vector::empty()
+            return vector[]
         };
         table::borrow(&registry.windows, window).submissions
     }

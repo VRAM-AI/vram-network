@@ -41,7 +41,7 @@ module slcl::reward_distributor {
     use sui::coin::{Self, Coin};
     use sui::balance::{Self, Balance};
 
-    const E_WINDOW_NOT_FINALIZED: u64    = 1;
+    // const E_WINDOW_NOT_FINALIZED: u64    = 1;
     const E_REWARDS_ALREADY_DISTRIBUTED: u64 = 2;
     const E_UNAUTHORIZED: u64           = 3;
     const E_EMPTY_REWARD_POOL: u64      = 4;

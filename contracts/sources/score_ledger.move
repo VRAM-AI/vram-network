@@ -19,7 +19,7 @@ module slcl::score_ledger {
     use sui::event;
 
     const E_SCORE_ALREADY_SUBMITTED: u64 = 1;
-    const E_WINDOW_FINALIZED: u64 = 2;
+    // const E_WINDOW_FINALIZED: u64 = 2;
     const E_SIGNATURE_INVALID: u64 = 3;
     const E_CHECKPOINT_MISMATCH: u64 = 4;
     const E_ENCLAVE_NOT_REGISTERED: u64 = 5;
@@ -152,7 +152,7 @@ module slcl::score_ledger {
         };
 
         if (!table::contains(&ledger.submissions, window)) {
-            table::add(&mut ledger.submissions, window, vector::empty());
+            table::add(&mut ledger.submissions, window, vector[]);
         };
 
         let existing = table::borrow(&ledger.submissions, window);

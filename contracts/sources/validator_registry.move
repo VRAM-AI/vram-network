@@ -37,7 +37,7 @@ module slcl::validator_registry {
     const E_NOT_REGISTERED: u64       = 1;
     const E_ALREADY_REGISTERED: u64   = 2;
     const E_INSUFFICIENT_STAKE: u64   = 3;
-    const E_UNAUTHORIZED: u64         = 4;
+    // const E_UNAUTHORIZED: u64         = 4;
     const E_MAX_VALIDATORS_REACHED: u64 = 404;
     const E_INSUFFICIENT_BURN: u64    = 405;
 
