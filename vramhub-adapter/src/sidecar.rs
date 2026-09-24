@@ -24,7 +24,7 @@
 //!
 //! ## Protocol
 //!
-//! The sidecar exposes a local HTTP server (default: http://127.0.0.1:7070):
+//! The sidecar exposes a local HTTP server (default: http://127.0.0.1:17070):
 //!
 //!   POST /train
 //!     Body:  { "uid": u64, "window": u64 }
@@ -49,10 +49,10 @@
 //!
 //!   # Terminal 1: start the Python sidecar
 //!   pip install -r scripts/requirements.txt
-//!   python scripts/vram_trainer.py --port 7070
+//!   python scripts/vram_trainer.py --port 17070
 //!
 //!   # Terminal 2: start the miner
-//!   VRAMHUB_SIDECAR_URL=http://127.0.0.1:7070 cargo run --bin vramhub-miner --features sidecar
+//!   VRAMHUB_SIDECAR_URL=http://127.0.0.1:17070 cargo run --bin vramhub-miner --features sidecar
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -64,7 +64,7 @@ use super::{Checkpoint, CompressedGradient, TrainingFrameworkAdapter};
 // ── Config ────────────────────────────────────────────────────────────────────
 
 fn sidecar_url() -> String {
-    std::env::var("VRAMHUB_SIDECAR_URL").unwrap_or_else(|_| "http://127.0.0.1:7070".to_string())
+    std::env::var("VRAMHUB_SIDECAR_URL").unwrap_or_else(|_| "http://127.0.0.1:17070".to_string())
 }
 
 // ── Wire types ────────────────────────────────────────────────────────────────
