@@ -31,8 +31,8 @@ The sidecar bridges this gap: a small Flask HTTP server wraps your training scri
 
 ```bash
 # Terminal 1 — start the sidecar with gpt2-124M on CPU
-pip install -r scripts/requirements.txt
-python scripts/vram_trainer.py --model gpt2 --device cpu
+pip install -r python/requirements.txt
+python python/vram_trainer.py --model gpt2 --device cpu
 
 # Terminal 2 — start the miner
 RUST_LOG=info VRAMHUB_SIDECAR_URL=http://127.0.0.1:17070 \
@@ -43,8 +43,8 @@ RUST_LOG=info VRAMHUB_SIDECAR_URL=http://127.0.0.1:17070 \
 
 ```bash
 # Terminal 1
-pip install -r scripts/requirements.txt
-python scripts/vram_trainer.py --model gpt2 --device cuda
+pip install -r python/requirements.txt
+python python/vram_trainer.py --model gpt2 --device cuda
 
 # Terminal 2
 RUST_LOG=info cargo run --release --bin vramhub-miner --features sidecar
@@ -54,7 +54,7 @@ RUST_LOG=info cargo run --release --bin vramhub-miner --features sidecar
 
 ```bash
 # Terminal 1
-python scripts/vram_trainer.py --model gpt2 --device mps
+python python/vram_trainer.py --model gpt2 --device mps
 
 # Terminal 2
 RUST_LOG=info cargo run --release --bin vramhub-miner --features sidecar
@@ -85,10 +85,10 @@ Any `AutoModelForCausalLM`-compatible model works. Pass the HuggingFace repo ID:
 
 ```bash
 # 1.3B — needs ~6 GB VRAM
-python scripts/vram_trainer.py --model EleutherAI/pythia-1.4b --device cuda
+python python/vram_trainer.py --model EleutherAI/pythia-1.4b --device cuda
 
 # 7B — needs ~14 GB VRAM (bf16 or quantized)
-python scripts/vram_trainer.py --model mistralai/Mistral-7B-v0.1 --device cuda
+python python/vram_trainer.py --model mistralai/Mistral-7B-v0.1 --device cuda
 ```
 
 Larger models produce more informative gradients and tend to score higher with validators. The tradeoff is longer training steps — each window is 10 minutes, so your step needs to complete well within that window.
@@ -155,7 +155,7 @@ The sidecar tries to load training data from HuggingFace's FineWeb-edu dataset (
 
 Both paths produce consistent batches for the same `(uid, window)` pair, which matters because validators re-run `forward_loss` to check your submitted loss is real.
 
-If you want to train on your own dataset, replace the `_get_batch` function in `scripts/vram_trainer.py`. The only constraint: given the same `(uid, window)` inputs, return the same batch every time.
+If you want to train on your own dataset, replace the `_get_batch` function in `python/vram_trainer.py`. The only constraint: given the same `(uid, window)` inputs, return the same batch every time.
 
 ---
 
@@ -205,7 +205,7 @@ The sidecar is not running or is on a different port. Start the Python process f
 
 **On Windows: "OSError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions"**
 
-Windows dynamically reserves the port range 7009-7108 (and other ranges) for Hyper-V, which blocks ports in the 7xxx range including the original default of 7070. The current default is 17070, which is well outside all Windows exclusions. If you picked a custom port in the 7xxx range, change it: `python scripts/vram_trainer.py --port 17070`. You can see all excluded ranges with `netsh interface ipv4 show excludedportrange protocol=tcp`.
+Windows dynamically reserves the port range 7009-7108 (and other ranges) for Hyper-V, which blocks ports in the 7xxx range including the original default of 7070. The current default is 17070, which is well outside all Windows exclusions. If you picked a custom port in the 7xxx range, change it: `python python/vram_trainer.py --port 17070`. You can see all excluded ranges with `netsh interface ipv4 show excludedportrange protocol=tcp`.
 
 **Sidecar crashes on large model with OOM**
 

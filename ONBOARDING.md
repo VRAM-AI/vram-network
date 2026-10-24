@@ -63,7 +63,7 @@ The key insight: we don't trust miners to self-report results. A Nitro enclave m
 | Nautilus enclave | AWS Nitro TEE — scores gradient quality (loss delta), signs with hardware Ed25519 key |
 | Sui contracts | PeerRegistry, ScoreLedger, RewardPool — coordination and token distribution |
 | VRAMScan | Block explorer at `https://www.vram.network` — shows live windows, miner scores, run history, training guide |
-| Python sidecar | `scripts/vram_trainer.py` — any HuggingFace causal LM trains via HTTP; Rust handles chain/Walrus/compression |
+| Python sidecar | `python/vram_trainer.py` — any HuggingFace causal LM trains via HTTP; Rust handles chain/Walrus/compression |
 
 ---
 
