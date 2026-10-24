@@ -75,8 +75,8 @@ Same nano-GPT model, running on Apple M-series GPU via Metal. No extra setup nee
 
 ```bash
 # Terminal 1: start the Python trainer (any HuggingFace causal LM)
-pip install -r scripts/requirements.txt
-python scripts/vram_trainer.py --model gpt2 --device cuda
+pip install -r python/requirements.txt
+python python/vram_trainer.py --model gpt2 --device cuda
 
 # Terminal 2: start the Rust miner pointing at the sidecar
 VRAMHUB_SIDECAR_URL=http://127.0.0.1:17070 \

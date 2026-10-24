@@ -153,10 +153,10 @@ To train with a custom PyTorch model instead of the built-in nano-GPT:
 
 ```bash
 # Install Python dependencies
-pip install -r scripts/requirements.txt
+pip install -r python/requirements.txt
 
 # Start the trainer (Terminal 1)
-python scripts/vram_trainer.py --model gpt2 --device cuda --port 17070
+python python/vram_trainer.py --model gpt2 --device cuda --port 17070
 
 # Start the miner pointed at the sidecar (Terminal 2)
 VRAMHUB_SIDECAR_URL=http://127.0.0.1:17070 \

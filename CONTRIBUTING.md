@@ -17,7 +17,7 @@ Thank you for your interest.
 | Block explorer (`vramscan/`) | **OPEN** | MIT |
 | Documentation (`docs/`) | **OPEN** | CC BY 4.0 |
 | Installer scripts (`scripts/install*.sh`) | **OPEN** | MIT |
-| Reference sidecars (`scripts/yolo_trainer.py`, `scripts/vram_trainer.py`) | **OPEN** | MIT |
+| Reference sidecar (`python/vram_trainer.py`) | **OPEN** | MIT |
 | **Miner / Validator / Aggregator daemons** | **CLOSED** — proprietary | not accepting PRs; signed binaries distributed via release channel |
 | **Enclave EIF** (lives in github.com/0x0sid/slc-nautilus) | **CLOSED** | not accepting PRs |
 | **Paper** (`paper/`) | **PRIVATE** until v0.9 transformer study completes | email team@vram.ai for review access |
